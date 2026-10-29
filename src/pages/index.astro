@@ -51,6 +51,60 @@ const geruesttypen = [
   'Treppenturm',
 ];
 
+const finder = [
+  {
+    task: 'Fassade streichen oder verputzen',
+    gerust: 'Fassadengerüst',
+    text: 'Arbeits- und Schutzgerüst entlang der Fassade – mit durchgehenden Arbeitslagen auf jeder Etage. Ideal für Maler-, Putz- und Maurerarbeiten.',
+    art: 'Fassadengerüst',
+  },
+  {
+    task: 'Dach decken oder sanieren',
+    gerust: 'Dachfanggerüst',
+    text: 'Schützt bei Arbeiten auf dem Dach vor Absturz und fängt herabfallendes Material auf. Oft kombiniert mit Fassadengerüst.',
+    art: 'Dachfanggerüst',
+  },
+  {
+    task: 'Solaranlage montieren',
+    gerust: 'Dachfanggerüst',
+    text: 'Für die PV-Montage brauchen Sie sicheren Zugang zum Dach und eine Absturzsicherung an der Traufe – beides liefert ein Dachfanggerüst.',
+    art: 'Dachfanggerüst',
+  },
+  {
+    task: 'Abriss oder Rückbau',
+    gerust: 'Schutzgerüst',
+    text: 'Hält Schutt und Staub zurück und sichert Nachbarn, Passanten und öffentliche Wege während der Abrissarbeiten.',
+    art: 'Arbeits- & Schutzgerüst',
+  },
+  {
+    task: 'Sicherer Aufstieg auf der Baustelle',
+    gerust: 'Treppenturm',
+    text: 'Bequemer und sicherer Zugang zu allen Gerüstlagen – statt Leitern. Besonders bei hohen Gebäuden und vielen Gewerken.',
+    art: 'Treppenturm',
+  },
+  {
+    task: 'Keine Verankerung an der Fassade möglich',
+    gerust: 'Freistehendes Gerüst',
+    text: 'Wenn nicht in der Fassade verankert werden kann oder darf – etwa bei Glasfronten oder denkmalgeschützten Gebäuden.',
+    art: 'Freistehendes Gerüst',
+  },
+];
+
+const tipps = [
+  {
+    title: 'Früh planen',
+    text: 'Buchen Sie möglichst 2 bis 4 Wochen vor dem Einsatz – in der Hochsaison eher früher.',
+  },
+  {
+    title: 'Gehweg betroffen?',
+    text: 'Steht das Gerüst auf Gehweg oder Straße, braucht es meist eine Genehmigung der Stadt. Klären Sie das frühzeitig mit uns ab.',
+  },
+  {
+    title: 'Fotos helfen',
+    text: 'Ein paar Fotos vom Gebäude und der Zufahrt sparen einen Besichtigungstermin und beschleunigen Ihr Angebot.',
+  },
+];
+
 const ablauf = [
   { title: 'Beratung', text: 'Wir besprechen Ihr Vorhaben und planen das passende Gerüst – auf Wunsch direkt vor Ort.' },
   { title: 'Lieferung & Montage', text: 'Termingerecht geliefert und fachgerecht von unserem Team aufgebaut.' },
@@ -110,6 +164,7 @@ const faq = [
       </a>
       <nav class="main-nav" aria-label="Hauptnavigation">
         <a href="#leistungen">Leistungen</a>
+        <a href="#finder">Gerüst-Finder</a>
         <a href="#ablauf">Ablauf</a>
         <a href="#projekte">Projekte</a>
         <a href="#faq">FAQ</a>
@@ -136,11 +191,8 @@ const faq = [
       />
       <div class="wrap hero-content">
         <p class="eyebrow hero-eyebrow">Gerüstbau & Verleih aus Solms</p>
-        <h1><span class="h1-line">Gerüste, die stehen.</span> <span class="h1-line h1-accent">Termine, die halten.</span></h1>
-        <p class="hero-text">
-          Wir planen, liefern und montieren Gerüste für Bauunternehmen und Privatkunden in ganz Hessen –
-          von der Beratung bis zur Abholung aus einer Hand.
-        </p>
+        <h1><span class="h1-line">Gerüstbau:</span> <span class="h1-line h1-accent">Gerüste Verleih &amp; mieten.</span></h1>
+        <p class="hero-sub">Effiziente Lösungen für Ihr Bauprojekt</p>
         <div class="hero-actions">
           <a href="#kontakt" class="btn btn-primary">Kostenloses Angebot</a>
           <a href={phoneHref} class="btn btn-ghost">Jetzt anrufen</a>
@@ -198,6 +250,49 @@ const faq = [
           <ul>
             {geruesttypen.map((t) => <li>{t}</li>)}
           </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gerüst-Finder -->
+    <section class="section finder" id="finder">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">Gerüst-Finder</p>
+          <h2>Welches Gerüst brauche ich?</h2>
+          <p class="lead">Wählen Sie Ihr Vorhaben – wir zeigen Ihnen, welches Gerüst dafür passt.</p>
+        </div>
+        <div class="finder-box">
+          <div class="finder-tasks" role="tablist" aria-label="Ihr Vorhaben">
+            {finder.map((f, i) => (
+              <button
+                type="button"
+                role="tab"
+                id={`finder-tab-${i}`}
+                aria-controls={`finder-panel-${i}`}
+                aria-selected={i === 0 ? 'true' : 'false'}
+                tabindex={i === 0 ? 0 : -1}
+              >
+                {f.task}
+              </button>
+            ))}
+          </div>
+          <div class="finder-panels">
+            {finder.map((f, i) => (
+              <div
+                class="finder-panel"
+                role="tabpanel"
+                id={`finder-panel-${i}`}
+                aria-labelledby={`finder-tab-${i}`}
+                hidden={i !== 0}
+              >
+                <p class="finder-kicker">Unsere Empfehlung</p>
+                <h3>{f.gerust}</h3>
+                <p>{f.text}</p>
+                <a href="#kontakt" class="btn btn-primary" data-art={f.art}>{f.gerust} anfragen</a>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -264,6 +359,30 @@ const faq = [
         <ul class="orte">
           {orte.map((o) => <li>{o}</li>)}
         </ul>
+      </div>
+    </section>
+
+    <!-- Gut zu wissen -->
+    <section class="section tipps-section">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">Gut zu wissen</p>
+          <h2>So klappt Ihr Gerüstprojekt reibungslos</h2>
+        </div>
+        <div class="tipps">
+          {tipps.map((t, i) => (
+            <article class="tipp">
+              <span class="tipp-num">{i + 1}</span>
+              <h3>{t.title}</h3>
+              <p>{t.text}</p>
+            </article>
+          ))}
+          <article class="tipp tipp-cta">
+            <h3>Wie groß ist meine Fassade?</h3>
+            <p>Unser Flächenrechner schätzt die Gerüstfläche in Sekunden – und übernimmt sie direkt in Ihre Anfrage.</p>
+            <a href="#rechner" class="btn btn-primary">Zum Flächenrechner</a>
+          </article>
+        </div>
       </div>
     </section>
 
@@ -334,6 +453,25 @@ const faq = [
               <option>Weiß ich noch nicht – bitte beraten</option>
             </select>
           </div>
+          <fieldset class="calc" id="rechner">
+            <legend>Flächenrechner <span>(optional)</span></legend>
+            <p class="calc-hint">Grobe Maße des Gebäudes in Metern – wir schätzen die Fassadenfläche rundum.</p>
+            <div class="calc-grid">
+              <div class="field">
+                <label for="laenge">Länge</label>
+                <input id="laenge" name="laenge" type="number" inputmode="decimal" min="0" step="0.5" placeholder="z. B. 12" />
+              </div>
+              <div class="field">
+                <label for="breite">Breite</label>
+                <input id="breite" name="breite" type="number" inputmode="decimal" min="0" step="0.5" placeholder="z. B. 9" />
+              </div>
+              <div class="field">
+                <label for="hoehe">Höhe</label>
+                <input id="hoehe" name="hoehe" type="number" inputmode="decimal" min="0" step="0.5" placeholder="z. B. 7" />
+              </div>
+            </div>
+            <p class="calc-result" id="calc-result" aria-live="polite">Ca. <strong>– m²</strong> Gerüstfläche</p>
+          </fieldset>
           <div class="field">
             <label for="nachricht">Ihr Vorhaben</label>
             <textarea id="nachricht" name="nachricht" rows="4" placeholder="z. B. Fassadenanstrich, Einfamilienhaus, ca. 8 m hoch, ab Mitte Mai"></textarea>
@@ -367,6 +505,57 @@ const faq = [
   const form = document.getElementById('anfrage') as HTMLFormElement | null;
   const error = document.getElementById('form-error');
 
+  // --- Gerüst-Finder tabs ---
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.finder-tasks [role="tab"]'));
+  const selectTab = (tab: HTMLButtonElement) => {
+    tabs.forEach((t) => {
+      const active = t === tab;
+      t.setAttribute('aria-selected', String(active));
+      t.tabIndex = active ? 0 : -1;
+      const panel = document.getElementById(t.getAttribute('aria-controls') ?? '');
+      if (panel) panel.hidden = !active;
+    });
+  };
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => selectTab(tab));
+    tab.addEventListener('keydown', (e) => {
+      const step = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0;
+      if (!step) return;
+      e.preventDefault();
+      const next = tabs[(i + step + tabs.length) % tabs.length];
+      selectTab(next);
+      next.focus();
+    });
+  });
+
+  // Finder CTA pre-selects the scaffold type in the form
+  const artSelect = document.getElementById('art') as HTMLSelectElement | null;
+  document.querySelectorAll<HTMLAnchorElement>('[data-art]').forEach((a) => {
+    a.addEventListener('click', () => {
+      if (artSelect) artSelect.value = a.dataset.art ?? '';
+    });
+  });
+
+  // --- Flächenrechner ---
+  const num = (id: string) => {
+    const el = document.getElementById(id) as HTMLInputElement | null;
+    const v = parseFloat((el?.value ?? '').replace(',', '.'));
+    return Number.isFinite(v) && v > 0 ? v : 0;
+  };
+  const calcArea = () => {
+    const l = num('laenge');
+    const b = num('breite');
+    const h = num('hoehe');
+    return l && b && h ? Math.round(2 * (l + b) * h) : 0;
+  };
+  const result = document.getElementById('calc-result');
+  ['laenge', 'breite', 'hoehe'].forEach((id) =>
+    document.getElementById(id)?.addEventListener('input', () => {
+      const area = calcArea();
+      if (result) result.innerHTML = `Ca. <strong>${area ? area.toLocaleString('de-DE') : '–'} m²</strong> Gerüstfläche`;
+    }),
+  );
+
   form?.addEventListener('submit', (e) => {
     e.preventDefault();
     const data = new FormData(form);
@@ -378,11 +567,15 @@ const faq = [
     }
     if (error) error.hidden = true;
 
+    const area = calcArea();
     const body = [
       `Name: ${get('name')}`,
       `Telefon: ${get('tel')}`,
       `Ort der Baustelle: ${get('ort') || '-'}`,
       `Art des Gerüsts: ${get('art') || '-'}`,
+      area
+        ? `Gebäudemaße: ${get('laenge')} x ${get('breite')} m, Höhe ${get('hoehe')} m (ca. ${area} m² Fassade rundum)`
+        : 'Gebäudemaße: -',
       '',
       get('nachricht'),
     ].join('\n');
@@ -501,11 +694,13 @@ const faq = [
       white-space: nowrap;
     }
   }
-  .hero-text {
-    margin-top: 22px;
-    max-width: 52ch;
-    font-size: clamp(1.1rem, 1.6vw, 1.3rem);
-    color: rgb(255 255 255 / 0.88);
+  .hero-sub {
+    margin-top: 20px;
+    font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+    font-weight: 500;
+    color: rgb(255 255 255 / 0.9);
+    padding-left: 18px;
+    border-left: 4px solid var(--accent);
   }
   .hero-actions {
     display: flex;
@@ -657,6 +852,201 @@ const faq = [
     border: 1px solid var(--line);
     font-weight: 500;
     color: var(--navy-dark);
+  }
+
+  /* Gerüst-Finder */
+  .finder {
+    padding-top: 0;
+  }
+  .finder-box {
+    display: grid;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .finder-tasks {
+    display: grid;
+    background: var(--paper);
+  }
+  .finder-tasks button {
+    font: inherit;
+    font-weight: 600;
+    text-align: left;
+    padding: 16px 22px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-left: 4px solid transparent;
+    background: transparent;
+    color: var(--steel);
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .finder-tasks button:last-child {
+    border-bottom: 0;
+  }
+  .finder-tasks button:hover {
+    background: #e9edf2;
+  }
+  .finder-tasks button[aria-selected='true'] {
+    background: var(--white);
+    color: var(--navy-dark);
+    border-left-color: var(--accent);
+  }
+  .finder-panels {
+    background: var(--navy);
+    color: var(--white);
+    display: grid;
+  }
+  .finder-panel {
+    padding: clamp(28px, 4vw, 52px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .finder-panel[hidden] {
+    display: none;
+  }
+  .finder-kicker {
+    font-family: var(--font-head);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .finder-panel h3 {
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+  }
+  .finder-panel p:not(.finder-kicker) {
+    color: rgb(255 255 255 / 0.85);
+    max-width: 48ch;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+  }
+  @media (max-width: 899px) {
+    .finder-tasks {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+    .finder-tasks::-webkit-scrollbar {
+      display: none;
+    }
+    .finder-tasks button {
+      flex: none;
+      scroll-snap-align: start;
+      white-space: nowrap;
+      padding: 10px 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--white);
+    }
+    .finder-tasks button:last-child {
+      border-bottom: 1px solid var(--line);
+    }
+    .finder-tasks button[aria-selected='true'] {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: var(--white);
+    }
+  }
+  @media (min-width: 900px) {
+    .finder-box {
+      grid-template-columns: 1fr 1.25fr;
+    }
+  }
+
+  /* Gut zu wissen */
+  .tipps-section {
+    background: var(--paper);
+  }
+  .tipps {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+  .tipp {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .tipp-num {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: var(--white);
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 1.3rem;
+  }
+  .tipp h3 {
+    color: var(--navy-dark);
+  }
+  .tipp p {
+    color: var(--muted);
+  }
+  .tipp-cta {
+    background: var(--navy);
+    color: var(--white);
+  }
+  .tipp-cta h3 {
+    color: var(--white);
+  }
+  .tipp-cta p {
+    color: rgb(255 255 255 / 0.8);
+    flex: 1;
+  }
+  .tipp-cta .btn {
+    align-self: flex-start;
+  }
+
+  /* Flächenrechner */
+  .calc {
+    margin: 0;
+    padding: 18px;
+    border: 1px dashed #b8c3cf;
+    border-radius: var(--radius);
+    background: var(--paper);
+    display: grid;
+    gap: 12px;
+  }
+  .calc legend {
+    font-weight: 700;
+    color: var(--navy-dark);
+    padding: 0 6px;
+  }
+  .calc legend span {
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .calc-hint {
+    font-size: 0.92rem;
+    color: var(--muted);
+  }
+  .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .calc-result {
+    font-size: 1.05rem;
+    color: var(--steel);
+  }
+  .calc-result strong {
+    font-family: var(--font-head);
+    font-size: 1.6rem;
+    color: var(--navy);
   }
 
   /* Ablauf */
