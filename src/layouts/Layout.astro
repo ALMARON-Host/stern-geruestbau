@@ -1,0 +1,55 @@
+---
+import '@fontsource/barlow/400.css';
+import '@fontsource/barlow/500.css';
+import '@fontsource/barlow/600.css';
+import '@fontsource/barlow-condensed/600.css';
+import '@fontsource/barlow-condensed/700.css';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+// Preview builds (served from a subfolder) must not show up on Google.
+const isPreview = import.meta.env.BASE_URL !== '/';
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {isPreview ? <meta name="robots" content="noindex, nofollow" /> : <link rel="canonical" href={canonical} />}
+    <meta name="theme-color" content="#1a4679" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'HomeAndConstructionBusiness',
+      name: 'Stern Gerüstbau & Verleih',
+      url: 'https://geruestbau-stern.de',
+      telephone: '+4915757824911',
+      email: 'info@geruestbau-stern.de',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Solmser Gewerbepark 19',
+        postalCode: '35606',
+        addressLocality: 'Solms',
+        addressRegion: 'Hessen',
+        addressCountry: 'DE',
+      },
+      areaServed: 'Hessen',
+    })} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
