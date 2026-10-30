@@ -1,0 +1,63 @@
+---
+import { url } from '../../lib/url';
+
+interface Props {
+  posts: { title: string; href: string; excerpt: string }[];
+}
+const { posts } = Astro.props;
+---
+
+<section class="section">
+  <div class="wrap post-grid">
+    {posts.map((p) => (
+      <article class="post-card">
+        <h2 class="pc-title"><a href={url(p.href)}>{p.title}</a></h2>
+        {p.excerpt && <p class="pc-text">{p.excerpt}</p>}
+        <a href={url(p.href)} class="pc-link" aria-hidden="true" tabindex="-1">Weiterlesen →</a>
+      </article>
+    ))}
+  </div>
+</section>
+
+<style>
+  .post-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+  .post-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 28px;
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--navy);
+    border-radius: 10px;
+  }
+  .pc-title {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 1.5rem;
+    line-height: 1.15;
+    text-transform: uppercase;
+  }
+  .pc-title a {
+    color: var(--navy-dark);
+    text-decoration: none;
+  }
+  .pc-title a:hover {
+    color: var(--navy);
+    text-decoration: underline;
+  }
+  .pc-text {
+    color: var(--muted);
+    flex: 1;
+  }
+  .pc-link {
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--navy);
+    text-decoration: none;
+  }
+</style>

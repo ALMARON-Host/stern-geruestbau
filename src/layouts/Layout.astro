@@ -5,16 +5,42 @@ import '@fontsource/barlow/600.css';
 import '@fontsource/barlow-condensed/600.css';
 import '@fontsource/barlow-condensed/700.css';
 import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import MobileCall from '../components/MobileCall.astro';
+import { contact } from '../data/site';
+import { url } from '../lib/url';
 
 interface Props {
   title: string;
   description: string;
+  ogImage?: string;
+  jsonLd?: object[];
 }
 
-const { title, description } = Astro.props;
+const { title, description, ogImage = '/media/2025-08-stern-geruestbau-scaled.webp', jsonLd = [] } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 // Preview builds (served from a subfolder) must not show up on Google.
 const isPreview = import.meta.env.BASE_URL !== '/';
+
+const business = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: contact.company,
+  url: 'https://geruestbau-stern.de/',
+  telephone: '+4915757824911',
+  email: contact.email,
+  image: new URL(url(ogImage), Astro.site).href,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: contact.street,
+    postalCode: contact.zip,
+    addressLocality: contact.city,
+    addressRegion: 'Hessen',
+    addressCountry: 'DE',
+  },
+  areaServed: 'Hessen',
+};
 ---
 
 <!doctype html>
@@ -28,28 +54,20 @@ const isPreview = import.meta.env.BASE_URL !== '/';
     <meta name="theme-color" content="#1a4679" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="de_DE" />
+    <meta property="og:site_name" content={contact.company} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <script type="application/ld+json" set:html={JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'HomeAndConstructionBusiness',
-      name: 'Stern Gerüstbau & Verleih',
-      url: 'https://geruestbau-stern.de',
-      telephone: '+4915757824911',
-      email: 'info@geruestbau-stern.de',
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: 'Solmser Gewerbepark 19',
-        postalCode: '35606',
-        addressLocality: 'Solms',
-        addressRegion: 'Hessen',
-        addressCountry: 'DE',
-      },
-      areaServed: 'Hessen',
-    })} />
+    <meta property="og:image" content={new URL(url(ogImage), Astro.site)} />
+    <script type="application/ld+json" set:html={JSON.stringify([business, ...jsonLd])} />
   </head>
   <body>
-    <slot />
+    <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+    <Header />
+    <main id="inhalt">
+      <slot />
+    </main>
+    <Footer />
+    <MobileCall />
   </body>
 </html>

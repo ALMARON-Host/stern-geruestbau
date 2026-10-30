@@ -1,0 +1,143 @@
+---
+import { url, withBase } from '../../lib/url';
+
+interface Props {
+  html?: string;
+  images: { src: string; alt: string }[];
+}
+const { html = '', images } = Astro.props;
+---
+
+<section class="section gallery-section">
+  <div class="wrap">
+    {html && <div class="prose section-intro" set:html={withBase(html)} />}
+    <p class="gallery-note">{images.length} Projektfotos – zum Vergrößern antippen</p>
+    <ul class="gallery">
+      {images.map((img, i) => (
+        <li>
+          <button type="button" class="g-item" data-index={i} aria-label={`Projektfoto ${i + 1} vergrößern`}>
+            <img src={url(img.src)} alt={img.alt || `Gerüstbau-Projekt von Stern Gerüstbau, Foto ${i + 1}`} loading="lazy" />
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <dialog class="lightbox" aria-label="Projektfoto">
+    <img alt="" />
+    <button type="button" class="lb-btn lb-prev" aria-label="Vorheriges Foto">‹</button>
+    <button type="button" class="lb-btn lb-next" aria-label="Nächstes Foto">›</button>
+    <button type="button" class="lb-btn lb-close" aria-label="Schließen">×</button>
+  </dialog>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.gallery-section').forEach((section) => {
+    const items = Array.from(section.querySelectorAll<HTMLButtonElement>('.g-item'));
+    const dialog = section.querySelector<HTMLDialogElement>('.lightbox')!;
+    const img = dialog.querySelector('img')!;
+    let index = 0;
+    const show = (i: number) => {
+      index = (i + items.length) % items.length;
+      const src = items[index].querySelector('img')!;
+      img.src = src.currentSrc || src.src;
+      img.alt = src.alt;
+    };
+    items.forEach((btn, i) => btn.addEventListener('click', () => { show(i); dialog.showModal(); }));
+    dialog.querySelector('.lb-prev')!.addEventListener('click', () => show(index - 1));
+    dialog.querySelector('.lb-next')!.addEventListener('click', () => show(index + 1));
+    dialog.querySelector('.lb-close')!.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') show(index - 1);
+      if (e.key === 'ArrowRight') show(index + 1);
+    });
+  });
+</script>
+
+<style>
+  .gallery-note {
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+  .gallery {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 700px) {
+    .gallery {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  @media (min-width: 1100px) {
+    .gallery {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+  }
+  .g-item {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: zoom-in;
+    aspect-ratio: 1;
+    background: var(--paper);
+  }
+  .g-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s;
+  }
+  .g-item:hover img {
+    transform: scale(1.05);
+  }
+  .lightbox {
+    border: 0;
+    padding: 0;
+    background: transparent;
+    max-width: 94vw;
+    max-height: 92vh;
+    overflow: visible;
+  }
+  .lightbox::backdrop {
+    background: rgb(5 14 28 / 0.9);
+  }
+  .lightbox img {
+    max-width: 94vw;
+    max-height: 88vh;
+    border-radius: 8px;
+  }
+  .lb-btn {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 0;
+    background: rgb(255 255 255 / 0.92);
+    color: var(--navy-dark);
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .lb-prev {
+    left: 16px;
+  }
+  .lb-next {
+    right: 16px;
+  }
+  .lb-close {
+    top: 32px;
+    right: 16px;
+    transform: none;
+  }
+</style>

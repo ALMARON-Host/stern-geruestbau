@@ -1,0 +1,87 @@
+---
+import { url, withBase, goodAlt } from '../../lib/url';
+import Buttons from './Buttons.astro';
+
+interface Props {
+  html: string;
+  images?: { src: string; alt: string }[];
+  buttons?: { text: string; href: string }[];
+  alt: string; // fallback alt text (page H1)
+  flip?: boolean;
+  tone?: 'white' | 'paper';
+}
+const { html, images = [], buttons = [], alt, flip = false, tone = 'white' } = Astro.props;
+const img = images[0];
+---
+
+<section class:list={['section', 'content-block', tone]}>
+  <div class:list={['wrap', img ? 'split' : 'single', { flip }]}>
+    <div class="prose">
+      <Fragment set:html={withBase(html)} />
+      <Buttons buttons={buttons} />
+    </div>
+    {img && (
+      <figure class="media">
+        <img src={url(img.src)} alt={goodAlt(img.alt, alt)} loading="lazy" />
+      </figure>
+    )}
+  </div>
+</section>
+
+<style>
+  .paper {
+    background: var(--paper);
+  }
+  .single .prose {
+    max-width: 820px;
+  }
+  /* Text-only sections: heading left, text right on wide screens */
+  @media (min-width: 960px) {
+    .single .prose:global(:has(> :is(h2, h3):first-child)) {
+      max-width: none;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.65fr);
+      column-gap: 72px;
+      align-items: start;
+    }
+    .single .prose :global(> :is(h2, h3):first-child) {
+      grid-column: 1;
+      grid-row: 1 / span 40;
+      position: sticky;
+      top: 130px;
+      padding-top: 18px;
+      border-top: 4px solid var(--accent);
+    }
+    .single .prose:global(:has(> :is(h2, h3):first-child) > :not(:first-child)) {
+      grid-column: 2;
+    }
+    .single .prose:global(:has(> :is(h2, h3):first-child) > :nth-child(2)) {
+      margin-top: 0;
+    }
+  }
+  .split {
+    display: grid;
+    gap: 40px;
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .split {
+      grid-template-columns: 1.15fr 1fr;
+      gap: 64px;
+    }
+    .flip .media {
+      order: -1;
+    }
+  }
+  .media {
+    margin: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .media img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+</style>

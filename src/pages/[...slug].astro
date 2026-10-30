@@ -1,0 +1,329 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import TrustBar from '../components/TrustBar.astro';
+import Blocks from '../components/Blocks.astro';
+import Finder from '../components/Finder.astro';
+import Testimonials from '../components/blocks/Testimonials.astro';
+import CtaBand from '../components/CtaBand.astro';
+import AnfrageForm from '../components/AnfrageForm.astro';
+import GoogleBadge from '../components/GoogleBadge.astro';
+import { pages, nav, contact, locations, serviceOfKind, categoryOfPost, photoFor, pageByPath, type Page } from '../data/site';
+import { url, withBase, textOf } from '../lib/url';
+
+export function getStaticPaths() {
+  return pages
+    .filter((p) => p.path !== '/')
+    .map((p) => ({ params: { slug: p.path.slice(1, -1) }, props: { page: p } }));
+}
+
+const { page } = Astro.props as { page: Page };
+const kind = page.kind;
+const hero = page.blocks.find((b) => b.type === 'hero');
+const site = Astro.site!;
+const abs = (p: string) => new URL(url(p), site).href;
+
+// ---- Labels & breadcrumbs ----
+const navLabel = (href: string) => nav.flatMap((n) => [n, ...(n.children ?? [])]).find((n) => 'href' in n && n.href === href)?.label;
+const svc = serviceOfKind[kind];
+const cityList = svc ? locations(svc.service) : [];
+const city = cityList.find((c) => c.href === page.path)?.name ?? textOf(page.h1);
+
+const categorySlug = page.path.split('/')[2] ?? '';
+const categoryNames: Record<string, string> = { dachdecker: 'Dachdeckerarbeiten', gerueste: 'Gerüste', uncategorized: 'Allgemein' };
+const category = kind === 'post' ? categoryOfPost(page.path) : undefined;
+const postCatSlug = category?.path.split('/')[2] ?? '';
+const ratgeberOf: Record<string, string> = { gerueste: '/gerueste-ratgeber/', dachdecker: '/dachdecker-ratgeber/' };
+
+let crumbs: { label: string; href?: string }[] = [{ label: 'Startseite', href: '/' }];
+if (kind === 'leistung') crumbs.push({ label: 'Portfolio', href: '/portfolio/' }, { label: navLabel(page.path) ?? page.h1 });
+else if (svc) crumbs.push({ label: svc.label, href: svc.href }, { label: city });
+else if (kind === 'ratgeber') crumbs.push({ label: 'Ratgeber' }, { label: navLabel(page.path) ?? page.h1 });
+else if (kind === 'post') {
+  const r = ratgeberOf[postCatSlug];
+  crumbs.push(r ? { label: `Ratgeber ${categoryNames[postCatSlug]}`, href: r } : { label: 'Blog' }, { label: page.h1 });
+} else if (kind === 'category') crumbs.push({ label: 'Blog' }, { label: categoryNames[categorySlug] ?? categorySlug });
+else crumbs.push({ label: navLabel(page.path) ?? page.h1 });
+
+const categoryH1 = `Blog: ${categoryNames[categorySlug] ?? categorySlug}`;
+// Hero shows the H1 (and an H2 directly following it, as on the original pages)
+const heroFromBlock = (hero?.headings ?? []).filter((h) => /^<h[12]>/.test(h));
+const heroHeadings =
+  kind === 'category' ? [`<h1>${categoryH1}</h1>`]
+  : kind === 'post' || kind === 'kontakt' || !heroFromBlock.length ? [`<h1>${page.h1}</h1>`]
+  : heroFromBlock;
+const heroImage = page.ogImage && !/leistung|logo/.test(page.ogImage) ? page.ogImage : photoFor(page.path);
+
+// ---- Post extras ----
+const postDate = page.date ? new Date(page.date).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
+const article = page.blocks.find((b) => b.type === 'article');
+const words = textOf(article?.html).split(' ').length;
+const related = category?.blocks[0]?.posts?.filter((p) => p.href !== page.path).slice(0, 4) ?? [];
+
+// ---- Testimonials for pages that have none (posts, ratgeber, portfolio) ----
+const home = pageByPath('/')!;
+const homeTestimonials = home.blocks.find((b) => b.type === 'testimonials')?.items ?? [];
+const hasTestimonials = page.blocks.some((b) => b.type === 'testimonials');
+
+// ---- Structured data ----
+const jsonLd: object[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.label, ...(c.href ? { item: abs(c.href) } : {}) })),
+  },
+];
+const faqItems = page.blocks.filter((b) => b.type === 'faq').flatMap((b) => b.items ?? []);
+if (faqItems.length) {
+  jsonLd.push({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqItems.map((f) => ({ '@type': 'Question', name: f.q.replace(/^\d+\.\s*/, ''), acceptedAnswer: { '@type': 'Answer', text: textOf(f.a) } })),
+  });
+}
+if (kind === 'post') {
+  jsonLd.push({
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: page.h1,
+    datePublished: page.date || undefined,
+    author: { '@type': 'Organization', name: contact.company },
+    publisher: { '@type': 'Organization', name: contact.company },
+    mainEntityOfPage: abs(page.path),
+  });
+}
+const showFinder = kind === 'leistung' || kind === 'ort-geruestbau';
+---
+
+<Layout title={page.title || page.h1} description={page.description} ogImage={heroImage} jsonLd={jsonLd}>
+  <PageHero
+    headings={heroHeadings}
+    image={heroImage}
+    crumbs={crumbs}
+    compact={['post', 'category', 'impressum', 'kontakt'].includes(kind)}
+    meta={kind === 'post' ? [postDate, `ca. ${Math.max(1, Math.round(words / 200))} Min. Lesezeit`].filter(Boolean).join(' · ') : undefined}
+  />
+
+  {kind === 'kontakt' ? (
+    <section class="section">
+      <div class="wrap kontakt-grid">
+        <div>
+          <p class="lead kontakt-lead">Wir kümmern uns umgehend um Ihr Anliegen</p>
+          <div class="kontakt-cards">
+            <a class="k-card" href={contact.phoneHref}>
+              <h4>Telefon</h4>
+              <h3>{contact.phone}</h3>
+            </a>
+            <a class="k-card" href={`mailto:${contact.email}`}>
+              <h4>Email</h4>
+              <h3>{contact.email}</h3>
+            </a>
+            <a class="k-card" href={contact.mapsUrl} target="_blank" rel="noopener">
+              <h4>Anschrift</h4>
+              <h3>{contact.company}<br />{contact.street}<br />{contact.zip} {contact.city}</h3>
+            </a>
+          </div>
+          <GoogleBadge variant="inline" />
+        </div>
+        <div>
+          <p class="form-title">Jetzt Gerüst anfragen</p>
+          <AnfrageForm />
+        </div>
+      </div>
+    </section>
+  ) : kind === 'post' ? (
+    <section class="section">
+      <div class="wrap article-grid">
+        <article class="prose article" set:html={withBase(article?.html ?? '')} />
+        <aside class="article-aside">
+          <div class="aside-card">
+            <p class="aside-title">Gerüst für Ihr Projekt?</p>
+            <p>Wir beraten Sie, liefern, montieren und holen wieder ab – in ganz Hessen.</p>
+            <a href={contact.phoneHref} class="aside-phone">{contact.phone}</a>
+            <a href={url('/kontakt/')} class="btn btn-primary">Angebot anfordern</a>
+            <GoogleBadge variant="inline" />
+          </div>
+          {related.length > 0 && (
+            <nav class="aside-card" aria-label="Weitere Beiträge">
+              <p class="aside-title">Weitere Beiträge</p>
+              <ul class="related">
+                {related.map((r) => <li><a href={url(r.href)}>{r.title}</a></li>)}
+              </ul>
+            </nav>
+          )}
+        </aside>
+      </div>
+    </section>
+  ) : (
+    <>
+      {kind !== 'impressum' && <TrustBar />}
+      <Blocks blocks={page.blocks} alt={textOf(page.h1)} currentPath={page.path} />
+    </>
+  )}
+
+  {svc && (
+    <section class="section more-cities" aria-label="Weitere Standorte">
+      <div class="wrap">
+        <p class="eyebrow">Weitere Standorte</p>
+        <p class="display-title">{svc.label} in Ihrer Nähe</p>
+        <ul class="city-chips">
+          {cityList.map((c) => (
+            <li><a href={url(c.href)} aria-current={c.href === page.path ? 'page' : undefined}>{c.name}</a></li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  {showFinder && <Finder />}
+  {!hasTestimonials && !['impressum', 'kontakt'].includes(kind) && <Testimonials items={homeTestimonials} />}
+  {kind !== 'kontakt' && <CtaBand />}
+</Layout>
+
+<style>
+  .kontakt-grid {
+    display: grid;
+    gap: 48px;
+  }
+  @media (min-width: 960px) {
+    .kontakt-grid {
+      grid-template-columns: 1fr 1.2fr;
+      gap: 72px;
+    }
+  }
+  .kontakt-lead {
+    margin: 0 0 28px;
+    font-size: 1.3rem;
+    color: var(--navy-dark);
+    font-weight: 500;
+  }
+  .kontakt-cards {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .k-card {
+    display: block;
+    padding: 22px 24px;
+    border: 1px solid var(--line);
+    border-left: 5px solid var(--navy);
+    border-radius: 10px;
+    text-decoration: none;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .k-card:hover {
+    box-shadow: var(--shadow);
+    border-left-color: var(--accent);
+  }
+  .k-card h4 {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .k-card h3 {
+    margin-top: 6px;
+    font-size: 1.6rem;
+    color: var(--navy-dark);
+    text-transform: none;
+    word-break: break-word;
+  }
+  .form-title {
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 2rem;
+    color: var(--navy-dark);
+    margin-bottom: 18px;
+  }
+
+  .article-grid {
+    display: grid;
+    gap: 48px;
+  }
+  @media (min-width: 1000px) {
+    .article-grid {
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 72px;
+    }
+    .article-aside {
+      position: sticky;
+      top: 120px;
+      align-self: start;
+    }
+  }
+  .article {
+    max-width: 760px;
+  }
+  .article-aside {
+    display: grid;
+    gap: 20px;
+  }
+  .aside-card {
+    padding: 26px;
+    border-radius: 12px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    display: grid;
+    gap: 12px;
+  }
+  .aside-title {
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 1.4rem;
+    color: var(--navy-dark);
+    line-height: 1.1;
+  }
+  .aside-phone {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 1.7rem;
+    color: var(--navy);
+    text-decoration: none;
+  }
+  .related {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .related a {
+    color: var(--navy-dark);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .related a:hover {
+    text-decoration: underline;
+  }
+
+  .more-cities {
+    background: var(--paper);
+  }
+  .city-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    list-style: none;
+    margin: 28px 0 0;
+    padding: 0;
+  }
+  .city-chips a {
+    display: inline-block;
+    padding: 9px 16px;
+    border: 1px solid var(--line);
+    background: var(--white);
+    border-radius: 999px;
+    font-weight: 500;
+    color: var(--navy-dark);
+    text-decoration: none;
+  }
+  .city-chips a:hover,
+  .city-chips a[aria-current='page'] {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: var(--white);
+  }
+</style>

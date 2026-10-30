@@ -1,0 +1,30 @@
+---
+import { url } from '../../lib/url';
+
+interface Props {
+  buttons?: { text: string; href: string }[];
+  center?: boolean;
+  light?: boolean;
+}
+const { buttons = [], center = false, light = false } = Astro.props;
+---
+
+{buttons.length > 0 && (
+  <div class:list={['block-buttons', { center }]}>
+    {buttons.map((b, i) => (
+      <a href={url(b.href)} class:list={['btn', i === 0 ? 'btn-primary' : light ? 'btn-ghost' : 'btn-navy']}>{b.text}</a>
+    ))}
+  </div>
+)}
+
+<style>
+  .block-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+  }
+  .center {
+    justify-content: center;
+  }
+</style>

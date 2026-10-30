@@ -1,0 +1,87 @@
+---
+// Intro text from the original hero area, with a contact card next to it.
+import { contact } from '../../data/site';
+import { url, withBase } from '../../lib/url';
+import Buttons from './Buttons.astro';
+
+interface Props {
+  html: string;
+  buttons?: { text: string; href: string }[];
+}
+const { html, buttons = [] } = Astro.props;
+---
+
+<section class="section intro">
+  <div class="wrap intro-grid">
+    <div class="prose prose-lead">
+      <Fragment set:html={withBase(html)} />
+      <Buttons buttons={buttons} />
+    </div>
+    <aside class="contact-card" aria-label="Kontakt">
+      <p class="cc-kicker">Ihr direkter Draht</p>
+      <a class="cc-phone" href={contact.phoneHref}>{contact.phone}</a>
+      <a class="cc-mail" href={`mailto:${contact.email}`}>{contact.email}</a>
+      <ul class="checks">
+        <li>Beratung bei der Auswahl des Gerüsts</li>
+        <li>Termingerechte Lieferung &amp; Abholung</li>
+        <li>Montage &amp; Demontage durch unser Team</li>
+        <li>Einweisung zur sicheren Nutzung</li>
+      </ul>
+      <a href={url('/kontakt/')} class="btn btn-primary cc-btn">Angebot anfordern</a>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .intro-grid {
+    display: grid;
+    gap: 40px;
+    align-items: start;
+  }
+  @media (min-width: 960px) {
+    .intro-grid {
+      grid-template-columns: 1fr 360px;
+      gap: 64px;
+    }
+    .contact-card {
+      position: sticky;
+      top: 120px;
+    }
+  }
+  .contact-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-top: 5px solid var(--accent);
+    border-radius: 10px;
+    padding: 28px;
+  }
+  .cc-kicker {
+    font-family: var(--font-head);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--sky);
+    font-size: 0.95rem;
+  }
+  .cc-phone {
+    display: block;
+    margin-top: 6px;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 2rem;
+    color: var(--navy-dark);
+    text-decoration: none;
+  }
+  .cc-mail {
+    display: block;
+    color: var(--muted);
+    font-weight: 500;
+    word-break: break-all;
+  }
+  .contact-card .checks {
+    margin: 20px 0 24px;
+  }
+  .cc-btn {
+    width: 100%;
+  }
+</style>

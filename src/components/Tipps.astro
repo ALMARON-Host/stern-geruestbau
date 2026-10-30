@@ -1,0 +1,86 @@
+---
+import { url } from '../lib/url';
+
+const tipps = [
+  { title: 'Früh planen', text: 'Buchen Sie möglichst 2 bis 4 Wochen vor dem Einsatz – in der Hochsaison eher früher.' },
+  { title: 'Gehweg betroffen?', text: 'Steht das Gerüst auf Gehweg oder Straße, braucht es meist eine Genehmigung der Stadt. Klären Sie das frühzeitig mit uns ab.' },
+  { title: 'Fotos helfen', text: 'Ein paar Fotos vom Gebäude und der Zufahrt sparen einen Besichtigungstermin und beschleunigen Ihr Angebot.' },
+];
+---
+
+<section class="section tipps-section" aria-label="Gut zu wissen">
+  <div class="wrap">
+    <p class="eyebrow">Gut zu wissen</p>
+    <p class="display-title">So klappt Ihr Gerüstprojekt reibungslos</p>
+    <div class="tipps">
+      {tipps.map((t, i) => (
+        <div class="tipp">
+          <span class="tipp-num">{i + 1}</span>
+          <p class="tipp-title">{t.title}</p>
+          <p class="tipp-text">{t.text}</p>
+        </div>
+      ))}
+      <div class="tipp tipp-cta">
+        <p class="tipp-title">Wie groß ist meine Fassade?</p>
+        <p class="tipp-text">Unser Flächenrechner schätzt die Gerüstfläche in Sekunden – und übernimmt sie direkt in Ihre Anfrage.</p>
+        <a href={url('/kontakt/') + '#rechner'} class="btn btn-primary">Zum Flächenrechner</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .tipps-section {
+    background: var(--paper);
+  }
+  .tipps {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    margin-top: 36px;
+  }
+  .tipp {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .tipp-num {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: var(--white);
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 1.3rem;
+  }
+  .tipp-title {
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 1.5rem;
+    line-height: 1.1;
+    color: var(--navy-dark);
+  }
+  .tipp-text {
+    color: var(--muted);
+  }
+  .tipp-cta {
+    background: var(--navy);
+  }
+  .tipp-cta .tipp-title {
+    color: var(--white);
+  }
+  .tipp-cta .tipp-text {
+    color: rgb(255 255 255 / 0.8);
+    flex: 1;
+  }
+  .tipp-cta .btn {
+    align-self: flex-start;
+  }
+</style>

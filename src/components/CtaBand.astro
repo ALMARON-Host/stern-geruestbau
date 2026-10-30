@@ -1,0 +1,65 @@
+---
+import { contact } from '../data/site';
+import { url } from '../lib/url';
+import GoogleBadge from './GoogleBadge.astro';
+
+interface Props {
+  title?: string;
+  text?: string;
+}
+const {
+  title = 'Ihr Gerüst – geplant, geliefert, montiert.',
+  text = 'Schildern Sie uns kurz Ihr Vorhaben. Wir beraten Sie und erstellen Ihnen ein unverbindliches Angebot.',
+} = Astro.props;
+---
+
+<section class="cta-band" aria-label="Kontakt aufnehmen">
+  <div class="wrap cta-inner">
+    <div>
+      <p class="cta-title">{title}</p>
+      <p class="cta-text">{text}</p>
+      <div class="cta-actions">
+        <a href={url('/kontakt/')} class="btn btn-primary">Kostenloses Angebot</a>
+        <a href={contact.phoneHref} class="btn btn-ghost">{contact.phone}</a>
+      </div>
+    </div>
+    <GoogleBadge />
+  </div>
+</section>
+
+<style>
+  .cta-band {
+    background: linear-gradient(110deg, var(--navy-deep), var(--navy));
+    color: var(--white);
+    padding-block: clamp(56px, 7vw, 88px);
+  }
+  .cta-inner {
+    display: grid;
+    gap: 32px;
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .cta-inner {
+      grid-template-columns: 1fr auto;
+    }
+  }
+  .cta-title {
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.05;
+  }
+  .cta-text {
+    margin-top: 14px;
+    color: rgb(255 255 255 / 0.85);
+    max-width: 56ch;
+    font-size: 1.1rem;
+  }
+  .cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 28px;
+  }
+</style>

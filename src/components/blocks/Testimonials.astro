@@ -1,0 +1,97 @@
+---
+import { withBase } from '../../lib/url';
+import Buttons from './Buttons.astro';
+
+interface Props {
+  html?: string;
+  items: { quote: string; name: string }[];
+  buttons?: { text: string; href: string }[];
+}
+const { html = '', items, buttons = [] } = Astro.props;
+---
+
+<section class="section testimonials" aria-label="Kundenstimmen">
+  <div class="wrap">
+    {html ? <div class="prose section-intro center" set:html={withBase(html)} /> : <p class="eyebrow eyebrow-center">Das sagen unsere Kunden</p>}
+    <div class="quotes">
+      {items.map((t) => (
+        <figure class="quote">
+          <div class="stars" aria-label="5 von 5 Sternen">★★★★★</div>
+          <blockquote>{t.quote}</blockquote>
+          <figcaption>
+            <span class="avatar" aria-hidden="true">{t.name.charAt(0)}</span>
+            <span>{t.name}<small>Kunde von Stern Gerüstbau</small></span>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+    <Buttons buttons={buttons} center />
+  </div>
+</section>
+
+<style>
+  .eyebrow-center {
+    display: flex;
+    justify-content: center;
+  }
+  .quotes {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    margin-top: 12px;
+  }
+  .quote {
+    margin: 0;
+    padding: 32px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    position: relative;
+  }
+  .quote::before {
+    content: '“';
+    position: absolute;
+    top: 6px;
+    right: 24px;
+    font-family: Georgia, serif;
+    font-size: 6rem;
+    line-height: 1;
+    color: var(--paper);
+  }
+  .stars {
+    color: #fbbc05;
+    letter-spacing: 0.12em;
+    font-size: 1.15rem;
+  }
+  blockquote {
+    margin: 12px 0 22px;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--navy-dark);
+    line-height: 1.5;
+    position: relative;
+  }
+  figcaption {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+  }
+  figcaption small {
+    display: block;
+    font-weight: 400;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+  .avatar {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: var(--white);
+    font-family: var(--font-head);
+    font-size: 1.2rem;
+  }
+</style>

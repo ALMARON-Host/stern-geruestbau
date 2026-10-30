@@ -1,0 +1,231 @@
+---
+// "Welches Gerüst brauche ich?" – new helper element. Titles are not headings,
+// so the original heading structure of each page stays unchanged.
+import { url } from '../lib/url';
+
+const finder = [
+  {
+    task: 'Fassade streichen oder verputzen',
+    gerust: 'Fassadengerüst',
+    text: 'Arbeits- und Schutzgerüst entlang der Fassade – mit durchgehenden Arbeitslagen auf jeder Etage. Ideal für Maler-, Putz- und Maurerarbeiten.',
+    art: 'Fassadengerüst',
+    href: '/fassadengeruest/',
+  },
+  {
+    task: 'Dach decken oder sanieren',
+    gerust: 'Dachfanggerüst',
+    text: 'Schützt bei Arbeiten auf dem Dach vor Absturz und fängt herabfallendes Material auf. Oft kombiniert mit Fassadengerüst.',
+    art: 'Dachfanggerüst',
+    href: '/dachdeckergeruest/',
+  },
+  {
+    task: 'Solaranlage montieren',
+    gerust: 'Dachfanggerüst',
+    text: 'Für die PV-Montage brauchen Sie sicheren Zugang zum Dach und eine Absturzsicherung an der Traufe – beides liefert ein Dachfanggerüst.',
+    art: 'Dachfanggerüst',
+    href: '/dachdeckergeruest/',
+  },
+  {
+    task: 'Wände oder Fassade streichen lassen',
+    gerust: 'Malergerüst',
+    text: 'Stabile Arbeitsflächen in jeder Höhe für Malerbetriebe – und auf Wunsch übernehmen wir auch die Malerarbeiten selbst.',
+    art: 'Fassadengerüst',
+    href: '/malergeruest/',
+  },
+  {
+    task: 'Industrie- oder Hallenprojekt',
+    gerust: 'Industriegerüst',
+    text: 'Gerüstlösungen für Industrieanlagen, Hallen und anspruchsvolle Bauwerke – geplant für Ihre betrieblichen Abläufe.',
+    art: 'Arbeits- & Schutzgerüst',
+    href: '/industriegeruest/',
+  },
+  {
+    task: 'Abriss oder Rückbau',
+    gerust: 'Schutzgerüst',
+    text: 'Hält Schutt und Staub zurück und sichert Nachbarn, Passanten und öffentliche Wege während der Abrissarbeiten.',
+    art: 'Arbeits- & Schutzgerüst',
+    href: '/portfolio/',
+  },
+  {
+    task: 'Sicherer Aufstieg auf der Baustelle',
+    gerust: 'Treppenturm',
+    text: 'Bequemer und sicherer Zugang zu allen Gerüstlagen – statt Leitern. Besonders bei hohen Gebäuden und vielen Gewerken.',
+    art: 'Treppenturm',
+    href: '/portfolio/',
+  },
+];
+---
+
+<section class="section finder" id="finder" aria-label="Gerüst-Finder">
+  <div class="wrap">
+    <p class="eyebrow">Gerüst-Finder</p>
+    <p class="display-title">Welches Gerüst brauche ich?</p>
+    <p class="lead">Wählen Sie Ihr Vorhaben – wir zeigen Ihnen, welches Gerüst dafür passt.</p>
+    <div class="finder-box">
+      <div class="finder-tasks" role="tablist" aria-label="Ihr Vorhaben">
+        {finder.map((f, i) => (
+          <button type="button" role="tab" id={`finder-tab-${i}`} aria-controls={`finder-panel-${i}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>
+            {f.task}
+          </button>
+        ))}
+      </div>
+      <div class="finder-panels">
+        {finder.map((f, i) => (
+          <div class="finder-panel" role="tabpanel" id={`finder-panel-${i}`} aria-labelledby={`finder-tab-${i}`} hidden={i !== 0}>
+            <p class="finder-kicker">Unsere Empfehlung</p>
+            <p class="finder-title">{f.gerust}</p>
+            <p class="finder-text">{f.text}</p>
+            <div class="finder-actions">
+              <a href={url('/kontakt/') + '#anfrage'} class="btn btn-primary" data-art={f.art}>{f.gerust} anfragen</a>
+              <a href={url(f.href)} class="btn btn-ghost">Mehr erfahren</a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.finder-tasks [role="tab"]'));
+  const selectTab = (tab: HTMLButtonElement) => {
+    tabs.forEach((t) => {
+      const active = t === tab;
+      t.setAttribute('aria-selected', String(active));
+      t.tabIndex = active ? 0 : -1;
+      const panel = document.getElementById(t.getAttribute('aria-controls') ?? '');
+      if (panel) panel.hidden = !active;
+    });
+  };
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => selectTab(tab));
+    tab.addEventListener('keydown', (e) => {
+      const step = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0;
+      if (!step) return;
+      e.preventDefault();
+      const next = tabs[(i + step + tabs.length) % tabs.length];
+      selectTab(next);
+      next.focus();
+    });
+  });
+  // Remember the chosen scaffold type for the contact form
+  document.querySelectorAll<HTMLAnchorElement>('[data-art]').forEach((a) =>
+    a.addEventListener('click', () => {
+      try { sessionStorage.setItem('stern-art', a.dataset.art ?? ''); } catch {}
+    }),
+  );
+</script>
+
+<style>
+  .finder-box {
+    display: grid;
+    margin-top: 36px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .finder-tasks {
+    display: grid;
+    background: var(--paper);
+  }
+  .finder-tasks button {
+    font: inherit;
+    font-weight: 600;
+    text-align: left;
+    padding: 15px 22px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-left: 4px solid transparent;
+    background: transparent;
+    color: var(--steel);
+    cursor: pointer;
+  }
+  .finder-tasks button:last-child {
+    border-bottom: 0;
+  }
+  .finder-tasks button:hover {
+    background: #e9edf2;
+  }
+  .finder-tasks button[aria-selected='true'] {
+    background: var(--white);
+    color: var(--navy-dark);
+    border-left-color: var(--accent);
+  }
+  .finder-panels {
+    background: var(--navy);
+    color: var(--white);
+    display: grid;
+  }
+  .finder-panel {
+    padding: clamp(28px, 4vw, 52px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .finder-panel[hidden] {
+    display: none;
+  }
+  .finder-kicker {
+    font-family: var(--font-head);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .finder-title {
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1;
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+  }
+  .finder-text {
+    color: rgb(255 255 255 / 0.85);
+    max-width: 48ch;
+    font-size: 1.1rem;
+  }
+  .finder-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  @media (max-width: 899px) {
+    .finder-tasks {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+    .finder-tasks::-webkit-scrollbar {
+      display: none;
+    }
+    .finder-tasks button {
+      flex: none;
+      scroll-snap-align: start;
+      white-space: nowrap;
+      padding: 10px 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--white);
+    }
+    .finder-tasks button:last-child {
+      border-bottom: 1px solid var(--line);
+    }
+    .finder-tasks button[aria-selected='true'] {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: var(--white);
+    }
+  }
+  @media (min-width: 900px) {
+    .finder-box {
+      grid-template-columns: 1fr 1.25fr;
+    }
+  }
+</style>

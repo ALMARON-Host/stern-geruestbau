@@ -1,0 +1,86 @@
+---
+import { url, withBase } from '../../lib/url';
+
+interface Props {
+  html?: string;
+  items: { headingHtml: string; html: string; href: string; buttonText: string }[];
+}
+const { html = '', items } = Astro.props;
+---
+
+<section class="section postlist">
+  <div class="wrap">
+    {html && <div class="prose section-intro center" set:html={withBase(html)} />}
+    <div class="post-grid">
+      {items.map((p) => (
+        <article class="post-card">
+          <div class="pc-head" set:html={p.headingHtml} />
+          <div class="pc-text" set:html={withBase(p.html)} />
+          <a href={url(p.href)} class="pc-link">
+            {p.buttonText}
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" /></svg>
+          </a>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .post-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    margin-top: 36px;
+  }
+  .post-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 28px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--navy);
+    border-radius: 10px;
+    transition: box-shadow 0.25s, transform 0.25s;
+  }
+  .post-card:hover {
+    box-shadow: var(--shadow);
+    transform: translateY(-3px);
+  }
+  .pc-head :global(h2),
+  .pc-head :global(h3) {
+    font-size: 1.6rem;
+    color: var(--navy-dark);
+  }
+  .pc-text {
+    color: var(--muted);
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .pc-text :global(p) {
+    margin: 0;
+  }
+  .pc-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--navy);
+    text-decoration: none;
+  }
+  .pc-link svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.2s;
+  }
+  .pc-link:hover svg {
+    transform: translateX(4px);
+  }
+</style>

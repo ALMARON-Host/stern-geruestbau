@@ -1,0 +1,69 @@
+---
+import { url, withBase, textOf } from '../../lib/url';
+import Buttons from './Buttons.astro';
+
+interface Props {
+  html: string;
+  items: { image?: { src: string; alt: string }; html: string }[];
+  buttons?: { text: string; href: string }[];
+}
+const { html, items, buttons = [] } = Astro.props;
+---
+
+<section class="section services">
+  <div class="wrap">
+    <div class="prose section-intro center" set:html={withBase(html)} />
+    <div class="svc-grid">
+      {items.map((it) => (
+        <article class="svc">
+          {it.image && (
+            <div class="svc-img">
+              <img src={url(it.image.src)} alt={textOf(it.html)} loading="lazy" />
+            </div>
+          )}
+          <div class="svc-body" set:html={withBase(it.html.startsWith('<') ? it.html : `<p>${it.html}</p>`)} />
+        </article>
+      ))}
+    </div>
+    <Buttons buttons={buttons} center />
+  </div>
+</section>
+
+<style>
+  .services {
+    background: var(--paper);
+  }
+  .svc-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    margin-top: 40px;
+  }
+  .svc {
+    background: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+  .svc:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+  }
+  .svc-img img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .svc-body {
+    padding: 20px 22px 24px;
+    border-top: 4px solid var(--navy);
+    font-weight: 600;
+    color: var(--navy-dark);
+    font-size: 1.08rem;
+    line-height: 1.4;
+  }
+  .svc-body :global(p) {
+    margin: 0;
+  }
+</style>

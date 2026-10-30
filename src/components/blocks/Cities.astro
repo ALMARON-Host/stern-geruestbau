@@ -1,0 +1,70 @@
+---
+import { url, withBase } from '../../lib/url';
+import Buttons from './Buttons.astro';
+
+interface Props {
+  html?: string;
+  links: { href: string; text: string }[];
+  buttons?: { text: string; href: string }[];
+  current?: string;
+}
+const { html = '', links, buttons = [], current } = Astro.props;
+---
+
+<section class="section cities">
+  <div class="wrap">
+    {html && <div class="prose prose-light section-intro" set:html={withBase(html)} />}
+    <ul class="city-list">
+      {links.map((l) => (
+        <li>
+          <a href={url(l.href)} aria-current={l.href === current ? 'page' : undefined}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" /></svg>
+            {l.text}
+          </a>
+        </li>
+      ))}
+    </ul>
+    <Buttons buttons={buttons} light />
+  </div>
+</section>
+
+<style>
+  .cities {
+    background: var(--navy);
+    color: var(--white);
+  }
+  .city-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+    margin: 28px 0 0;
+  }
+  .city-list a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px 9px 12px;
+    border: 1px solid rgb(255 255 255 / 0.3);
+    border-radius: 999px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  }
+  .city-list a:hover,
+  .city-list a[aria-current='page'] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--navy-deep);
+  }
+  .city-list svg {
+    width: 16px;
+    height: 16px;
+    color: var(--accent);
+  }
+  .city-list a:hover svg,
+  .city-list a[aria-current='page'] svg {
+    color: var(--navy-deep);
+  }
+</style>

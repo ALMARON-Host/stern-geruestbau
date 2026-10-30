@@ -1,0 +1,62 @@
+---
+// Renders the migrated page blocks in their original order.
+import type { Block } from '../data/site';
+import Intro from './blocks/Intro.astro';
+import Content from './blocks/Content.astro';
+import Services from './blocks/Services.astro';
+import Faq from './blocks/Faq.astro';
+import Satisfaction from './blocks/Satisfaction.astro';
+import Testimonials from './blocks/Testimonials.astro';
+import Values from './blocks/Values.astro';
+import Cities from './blocks/Cities.astro';
+import PostList from './blocks/PostList.astro';
+import Slides from './blocks/Slides.astro';
+import Gallery from './blocks/Gallery.astro';
+import Category from './blocks/Category.astro';
+
+interface Props {
+  blocks: Block[];
+  alt: string;
+  currentPath?: string;
+}
+const { blocks, alt, currentPath } = Astro.props;
+
+// Background of the previous block decides the tone of the next plain content block
+const darkOrPaper = new Set(['services', 'satisfaction', 'cities', 'values']);
+let contentIndex = 0;
+---
+
+{blocks.map((b, i) => {
+  switch (b.type) {
+    case 'hero':
+      return b.html?.trim() ? <Intro html={b.html} buttons={b.buttons} /> : null;
+    case 'content': {
+      const prev = blocks[i - 1]?.type ?? '';
+      const tone = darkOrPaper.has(prev) || prev === 'testimonials' ? 'white' : contentIndex % 2 ? 'paper' : 'white';
+      const flip = contentIndex++ % 2 === 1;
+      return <Content html={b.html ?? ''} images={b.images} buttons={b.buttons} alt={alt} tone={tone} flip={flip} />;
+    }
+    case 'services':
+      return <Services html={b.html ?? ''} items={b.items ?? []} buttons={b.buttons} />;
+    case 'faq':
+      return <Faq html={b.html ?? ''} items={b.items ?? []} buttons={b.buttons} />;
+    case 'satisfaction':
+      return <Satisfaction html={b.html ?? ''} images={b.images} alt={alt} />;
+    case 'testimonials':
+      return <Testimonials html={b.html} items={b.items ?? []} buttons={b.buttons} />;
+    case 'values':
+      return <Values html={b.html ?? ''} images={b.images} buttons={b.buttons} alt={alt} />;
+    case 'cities':
+      return <Cities html={b.html} links={b.links ?? []} buttons={b.buttons} current={currentPath} />;
+    case 'postlist':
+      return <PostList html={b.html} items={b.items ?? []} />;
+    case 'slides':
+      return <Slides slides={b.slides ?? []} />;
+    case 'gallery':
+      return <Gallery html={b.html} images={b.images ?? []} />;
+    case 'category':
+      return <Category posts={b.posts ?? []} />;
+    default:
+      return null;
+  }
+})}

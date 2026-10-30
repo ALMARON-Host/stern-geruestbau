@@ -1,0 +1,169 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/images/logo.png';
+import { contact, nav, locations } from '../data/site';
+import { url } from '../lib/url';
+import GoogleBadge from './GoogleBadge.astro';
+
+const leistungen = nav.find((n) => n.label === 'Portfolio')!.children!;
+const ratgeber = nav.find((n) => n.label === 'Ratgeber')!.children!;
+const orte = locations('geruestbau');
+---
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="f-brand">
+      <a href={url('/')} class="f-logo" aria-label="Stern Gerüstbau – zur Startseite">
+        <Image src={logo} alt="Stern Gerüstbau & Verleih" width={480} widths={[240, 480]} sizes="240px" />
+      </a>
+      <p class="f-claim">Gerüstbau, Gerüstverleih, Maler- und Dachdeckerarbeiten aus Solms – für Bauunternehmen und Privatkunden.</p>
+      <GoogleBadge variant="inline" />
+    </div>
+
+    <div>
+      <p class="f-title">Kontaktieren Sie uns</p>
+      <ul class="f-contact">
+        <li><span>Telefon</span><a href={contact.phoneHref}>{contact.phone}</a></li>
+        <li><span>E-Mail</span><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+        <li>
+          <span>Anschrift</span>
+          <a href={contact.mapsUrl} target="_blank" rel="noopener">{contact.company}<br />{contact.street}<br />{contact.zip} {contact.city}</a>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="f-title">Leistungen</p>
+      <ul class="f-links">
+        <li><a href={url('/portfolio/')}>Portfolio</a></li>
+        {leistungen.map((l) => <li><a href={url(l.href)}>{l.label}</a></li>)}
+      </ul>
+      <p class="f-title f-title-gap">Ratgeber</p>
+      <ul class="f-links">
+        {ratgeber.map((l) => <li><a href={url(l.href)}>{l.label}</a></li>)}
+      </ul>
+    </div>
+
+    <div>
+      <p class="f-title">Gerüstbau in Ihrer Nähe</p>
+      <ul class="f-links f-cities">
+        {orte.map((o) => <li><a href={url(o.href)}>{o.name}</a></li>)}
+      </ul>
+    </div>
+  </div>
+
+  <div class="f-bottom">
+    <div class="wrap f-bottom-inner">
+      <p>© {new Date().getFullYear()} {contact.company}</p>
+      <nav aria-label="Quicklinks">
+        <a href={url('/')}>Startseite</a>
+        <a href={url('/portfolio/')}>Portfolio</a>
+        <a href={url('/kontakt/')}>Kontakt</a>
+        <a href={url('/impressum/')}>Impressum</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--navy-deep);
+    color: rgb(255 255 255 / 0.75);
+    font-size: 0.98rem;
+  }
+  .footer-grid {
+    display: grid;
+    gap: 40px;
+    padding-block: 64px 48px;
+  }
+  @media (min-width: 700px) {
+    .footer-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (min-width: 1100px) {
+    .footer-grid {
+      grid-template-columns: 1.3fr 1fr 1fr 1.2fr;
+    }
+  }
+  .f-logo {
+    display: inline-block;
+    background: var(--white);
+    padding: 12px 16px;
+    border-radius: 10px;
+  }
+  .f-logo img {
+    width: 220px;
+  }
+  .f-claim {
+    margin: 18px 0 20px;
+    max-width: 34ch;
+  }
+  .f-title {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 14px;
+  }
+  .f-title-gap {
+    margin-top: 26px;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .f-links li + li {
+    margin-top: 6px;
+  }
+  .f-cities {
+    columns: 2;
+    column-gap: 20px;
+  }
+  .f-cities li {
+    break-inside: avoid;
+  }
+  a {
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--accent);
+  }
+  .f-contact li + li {
+    margin-top: 14px;
+  }
+  .f-contact span {
+    display: block;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.5);
+  }
+  .f-contact a {
+    color: var(--white);
+    font-weight: 600;
+  }
+  .f-bottom {
+    border-top: 1px solid rgb(255 255 255 / 0.1);
+    padding: 22px 0 96px;
+  }
+  .f-bottom-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px 24px;
+  }
+  .f-bottom nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+  }
+  @media (min-width: 900px) {
+    .f-bottom {
+      padding-bottom: 22px;
+    }
+  }
+</style>

@@ -172,6 +172,139 @@ p {
   outline-offset: 3px;
 }
 
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -100px;
+  z-index: 100;
+  padding: 10px 16px;
+  background: var(--navy);
+  color: var(--white);
+  border-radius: var(--radius);
+}
+.skip-link:focus {
+  top: 12px;
+}
+
+body.no-scroll {
+  overflow: hidden;
+}
+
+/* Large title that is deliberately not a heading (keeps the original H structure) */
+.display-title {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: var(--navy-dark);
+}
+
+.section-intro {
+  max-width: 820px;
+}
+.section-intro.center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+/* Migrated rich text */
+.prose > * + * {
+  margin-top: 1em;
+}
+.prose :where(h1, h2) {
+  font-size: clamp(1.9rem, 3.6vw, 2.75rem);
+  color: var(--navy-dark);
+}
+.prose :where(h3) {
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  color: var(--navy-dark);
+}
+.prose :where(h4, h5, h6) {
+  font-size: 1.3rem;
+  color: var(--navy-dark);
+}
+.prose :where(h2, h3, h4) + * {
+  margin-top: 0.8em;
+}
+.prose :where(* + h2, * + h3, * + h4) {
+  margin-top: 1.6em;
+}
+.prose :where(p, li) {
+  color: var(--ink);
+}
+.prose strong {
+  color: var(--navy-dark);
+}
+.prose a:not(.btn) {
+  color: var(--navy);
+  font-weight: 600;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.prose :where(ul) {
+  list-style: none;
+  padding: 0;
+}
+.prose :where(ul) > li {
+  position: relative;
+  padding-left: 30px;
+}
+.prose :where(ul) > li + li {
+  margin-top: 8px;
+}
+.prose :where(ul) > li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.32em;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--navy) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f2b230' stroke-width='3.5'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 11px no-repeat;
+}
+.prose :where(ol) {
+  padding-left: 1.3em;
+}
+.prose :where(ol) > li + li {
+  margin-top: 8px;
+}
+.prose img {
+  border-radius: 10px;
+  margin-block: 1.5em;
+}
+.prose-lead > p:first-child {
+  font-size: 1.2rem;
+  color: var(--navy-dark);
+  font-weight: 500;
+}
+.prose-light :where(h1, h2, h3, h4, p, li, strong) {
+  color: var(--white);
+}
+
+/* Check list used in cards */
+.checks {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.checks li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-weight: 500;
+}
+.checks li::before {
+  content: '';
+  flex: none;
+  margin-top: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b1d35' stroke-width='3.5'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 12px no-repeat;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

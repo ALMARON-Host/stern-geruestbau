@@ -1,0 +1,106 @@
+---
+import { withBase } from '../../lib/url';
+import Buttons from './Buttons.astro';
+
+interface Props {
+  html: string;
+  items: { level: number; q: string; a: string }[];
+  buttons?: { text: string; href: string }[];
+}
+const { html, items, buttons = [] } = Astro.props;
+---
+
+<section class="section faq">
+  <div class="wrap faq-grid">
+    <div class="faq-head">
+      <div class="prose" set:html={withBase(html)} />
+      <p class="faq-hint">Ihre Frage ist nicht dabei? Wir beraten Sie gern persönlich.</p>
+      <Buttons buttons={buttons} />
+    </div>
+    <div class="faq-list">
+      {items.map((f, i) => {
+        const H = `h${f.level}` as 'h4';
+        return (
+          <details open={i === 0}>
+            <summary><H>{f.q}</H></summary>
+            <div class="faq-a prose" set:html={withBase(f.a.startsWith('<') ? f.a : `<p>${f.a}</p>`)} />
+          </details>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-grid {
+    display: grid;
+    gap: 36px;
+  }
+  @media (min-width: 960px) {
+    .faq-grid {
+      grid-template-columns: 1fr 1.6fr;
+      gap: 72px;
+    }
+  }
+  .faq-hint {
+    margin-top: 14px;
+    color: var(--muted);
+  }
+  details {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--white);
+    transition: box-shadow 0.2s;
+  }
+  details + details {
+    margin-top: 12px;
+  }
+  details[open] {
+    box-shadow: var(--shadow);
+    border-color: transparent;
+  }
+  summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 22px;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary::after {
+    content: '+';
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--navy);
+    font-size: 1.4rem;
+    line-height: 1;
+    transition: transform 0.2s, background-color 0.2s;
+  }
+  details[open] summary::after {
+    transform: rotate(45deg);
+    background: var(--accent);
+  }
+  summary :global(h4),
+  summary :global(h5) {
+    font-family: var(--font-body);
+    text-transform: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    line-height: 1.4;
+    color: var(--navy-dark);
+    margin: 0;
+  }
+  .faq-a {
+    padding: 0 22px 22px;
+    color: var(--muted);
+  }
+</style>

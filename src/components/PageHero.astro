@@ -1,0 +1,92 @@
+---
+import Breadcrumbs from './Breadcrumbs.astro';
+import GoogleBadge from './GoogleBadge.astro';
+import { contact } from '../data/site';
+import { url, withBase } from '../lib/url';
+
+interface Props {
+  headings: string[]; // original heading HTML, e.g. ["<h1>…</h1>"]
+  image: string;
+  crumbs: { label: string; href?: string }[];
+  meta?: string;
+  compact?: boolean;
+}
+const { headings, image, crumbs, meta, compact = false } = Astro.props;
+---
+
+<section class:list={['page-hero', { compact }]}>
+  <img class="ph-bg" src={url(image)} alt="" fetchpriority="high" />
+  <div class="wrap ph-content">
+    <Breadcrumbs items={crumbs} />
+    <div class="ph-headings" set:html={withBase(headings.join(''))} />
+    {meta && <p class="ph-meta">{meta}</p>}
+    {!compact && (
+      <div class="ph-actions">
+        <a href={url('/kontakt/')} class="btn btn-primary">Kostenloses Angebot</a>
+        <a href={contact.phoneHref} class="btn btn-ghost">Jetzt anrufen</a>
+        <GoogleBadge />
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    position: relative;
+    isolation: isolate;
+    color: var(--white);
+    overflow: hidden;
+  }
+  .ph-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+  }
+  .page-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(100deg, rgb(11 29 53 / 0.95) 0%, rgb(16 41 74 / 0.86) 55%, rgb(16 41 74 / 0.55) 100%);
+  }
+  .ph-content {
+    padding-block: clamp(48px, 8vw, 96px);
+  }
+  .compact .ph-content {
+    padding-block: clamp(40px, 6vw, 72px);
+  }
+  .ph-headings :global(h1) {
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    max-width: 22ch;
+    color: var(--white);
+  }
+  .ph-headings :global(h2),
+  .ph-headings :global(h3) {
+    margin-top: 16px;
+    font-family: var(--font-body);
+    text-transform: none;
+    font-weight: 500;
+    font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+    color: rgb(255 255 255 / 0.9);
+    padding-left: 16px;
+    border-left: 4px solid var(--accent);
+    line-height: 1.35;
+  }
+  .ph-meta {
+    margin-top: 16px;
+    color: rgb(255 255 255 / 0.8);
+  }
+  .ph-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+    margin-top: 32px;
+  }
+  .ph-actions :global(.g-badge) {
+    margin-left: 4px;
+  }
+</style>

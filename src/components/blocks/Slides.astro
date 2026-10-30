@@ -1,0 +1,50 @@
+---
+// Portfolio slides shown as alternating feature rows.
+import { url, withBase } from '../../lib/url';
+import { photoFor } from '../../data/site';
+
+interface Props {
+  slides: { titleHtml: string; html: string; image: string }[];
+}
+const { slides } = Astro.props;
+---
+
+<section class="section slides">
+  <div class="wrap">
+    {slides.map((s, i) => (
+      <div class:list={['slide', { flip: i % 2 === 1 }]}>
+        <div class="prose">
+          <Fragment set:html={withBase(s.titleHtml + s.html)} />
+        </div>
+        <img src={url(s.image || photoFor('slide' + i))} alt="" loading="lazy" />
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .slide {
+    display: grid;
+    gap: 32px;
+    align-items: center;
+  }
+  .slide + .slide {
+    margin-top: 56px;
+  }
+  @media (min-width: 900px) {
+    .slide {
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+    }
+    .flip img {
+      order: -1;
+    }
+  }
+  img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+</style>

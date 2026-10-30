@@ -1,0 +1,202 @@
+---
+// Request form with area calculator. Opens the visitor's mail program
+// with a prepared request (no server needed).
+import { contact } from '../data/site';
+
+const arten = ['Arbeits- & Schutzgerüst', 'Dachfanggerüst', 'Fassadengerüst', 'Freistehendes Gerüst', 'Treppenturm', 'Industriegerüst', 'Malerarbeiten', 'Dachdeckerarbeiten'];
+---
+
+<form class="anfrage-form" id="anfrage" novalidate data-email={contact.email}>
+  <div class="field">
+    <label for="f-name">Name *</label>
+    <input id="f-name" name="name" type="text" autocomplete="name" required />
+  </div>
+  <div class="field-row">
+    <div class="field">
+      <label for="f-tel">Telefon *</label>
+      <input id="f-tel" name="tel" type="tel" autocomplete="tel" required />
+    </div>
+    <div class="field">
+      <label for="f-ort">Ort der Baustelle</label>
+      <input id="f-ort" name="ort" type="text" autocomplete="address-level2" />
+    </div>
+  </div>
+  <div class="field">
+    <label for="f-art">Was benötigen Sie?</label>
+    <select id="f-art" name="art">
+      <option value="">Bitte wählen</option>
+      {arten.map((a) => <option>{a}</option>)}
+      <option>Weiß ich noch nicht – bitte beraten</option>
+    </select>
+  </div>
+  <fieldset class="calc" id="rechner">
+    <legend>Flächenrechner <span>(optional)</span></legend>
+    <p class="calc-hint">Grobe Maße des Gebäudes in Metern – wir schätzen die Fassadenfläche rundum.</p>
+    <div class="calc-grid">
+      <div class="field">
+        <label for="f-laenge">Länge (m)</label>
+        <input id="f-laenge" name="laenge" type="number" inputmode="decimal" min="0" step="0.5" placeholder="12" />
+      </div>
+      <div class="field">
+        <label for="f-breite">Breite (m)</label>
+        <input id="f-breite" name="breite" type="number" inputmode="decimal" min="0" step="0.5" placeholder="9" />
+      </div>
+      <div class="field">
+        <label for="f-hoehe">Höhe (m)</label>
+        <input id="f-hoehe" name="hoehe" type="number" inputmode="decimal" min="0" step="0.5" placeholder="7" />
+      </div>
+    </div>
+    <p class="calc-result" aria-live="polite">Ca. <strong>– m²</strong> Gerüstfläche</p>
+  </fieldset>
+  <div class="field">
+    <label for="f-nachricht">Ihr Vorhaben</label>
+    <textarea id="f-nachricht" name="nachricht" rows="4" placeholder="z. B. Fassadenanstrich, Einfamilienhaus, ab Mitte Mai"></textarea>
+  </div>
+  <p class="form-error" role="alert" hidden>Bitte geben Sie Ihren Namen und Ihre Telefonnummer an.</p>
+  <button type="submit" class="btn btn-primary">Anfrage senden</button>
+  <p class="form-note">Beim Absenden öffnet sich Ihr E-Mail-Programm mit der vorbereiteten Anfrage. Lieber direkt sprechen? <a href={contact.phoneHref}>{contact.phone}</a></p>
+</form>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>('.anfrage-form').forEach((form) => {
+    const $ = <T extends Element>(sel: string) => form.querySelector<T>(sel);
+    const error = $<HTMLElement>('.form-error');
+    const result = $<HTMLElement>('.calc-result');
+    const art = $<HTMLSelectElement>('select[name="art"]');
+
+    try {
+      const saved = sessionStorage.getItem('stern-art');
+      if (saved && art) art.value = saved;
+    } catch {}
+
+    const num = (name: string) => {
+      const v = parseFloat(($<HTMLInputElement>(`[name="${name}"]`)?.value ?? '').replace(',', '.'));
+      return Number.isFinite(v) && v > 0 ? v : 0;
+    };
+    const area = () => {
+      const [l, b, h] = [num('laenge'), num('breite'), num('hoehe')];
+      return l && b && h ? Math.round(2 * (l + b) * h) : 0;
+    };
+    ['laenge', 'breite', 'hoehe'].forEach((n) =>
+      $(`[name="${n}"]`)?.addEventListener('input', () => {
+        const a = area();
+        if (result) result.innerHTML = `Ca. <strong>${a ? a.toLocaleString('de-DE') : '–'} m²</strong> Gerüstfläche`;
+      }),
+    );
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const get = (k: string) => String(data.get(k) ?? '').trim();
+      if (!get('name') || !get('tel')) {
+        if (error) error.hidden = false;
+        return;
+      }
+      if (error) error.hidden = true;
+      const a = area();
+      const body = [
+        `Name: ${get('name')}`,
+        `Telefon: ${get('tel')}`,
+        `Ort der Baustelle: ${get('ort') || '-'}`,
+        `Benötigt: ${get('art') || '-'}`,
+        a ? `Gebäudemaße: ${get('laenge')} x ${get('breite')} m, Höhe ${get('hoehe')} m (ca. ${a} m² Fassade rundum)` : 'Gebäudemaße: -',
+        '',
+        get('nachricht'),
+      ].join('\n');
+      const subject = `Anfrage von ${get('name')}`;
+      window.location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    });
+  });
+</script>
+
+<style>
+  .anfrage-form {
+    background: var(--white);
+    color: var(--ink);
+    padding: clamp(24px, 4vw, 40px);
+    border-radius: 12px;
+    display: grid;
+    gap: 18px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--line);
+  }
+  .field {
+    display: grid;
+    gap: 6px;
+  }
+  .field-row {
+    display: grid;
+    gap: 18px;
+  }
+  @media (min-width: 560px) {
+    .field-row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--steel);
+  }
+  input,
+  select,
+  textarea {
+    font: inherit;
+    padding: 12px 14px;
+    border: 1px solid #c4ccd6;
+    border-radius: var(--radius);
+    background: var(--white);
+    color: var(--ink);
+    width: 100%;
+  }
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgb(26 70 121 / 0.2);
+  }
+  .calc {
+    margin: 0;
+    padding: 18px;
+    border: 1px dashed #b8c3cf;
+    border-radius: var(--radius);
+    background: var(--paper);
+    display: grid;
+    gap: 12px;
+  }
+  legend {
+    font-weight: 700;
+    color: var(--navy-dark);
+    padding: 0 6px;
+  }
+  legend span {
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .calc-hint {
+    font-size: 0.92rem;
+    color: var(--muted);
+  }
+  .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .calc-result {
+    color: var(--steel);
+  }
+  .calc-result :global(strong) {
+    font-family: var(--font-head);
+    font-size: 1.6rem;
+    color: var(--navy);
+  }
+  .form-error {
+    color: #b42318;
+    font-weight: 600;
+  }
+  .form-note {
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+</style>
