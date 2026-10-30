@@ -82,11 +82,14 @@ const cityName = (slug: string) =>
     .join(' ')
     .replace('Giessen', 'Gießen');
 
+// On the original site the Gießen roofer page has the address /dachdecker-friedrichsdorf-2/
+const cityOverrides: Record<string, string> = { '/dachdecker-friedrichsdorf-2/': 'Gießen' };
+
 /** All location pages of a service, e.g. 'geruestbau' → [{ name, href }] */
 export const locations = (service: 'geruestbau' | 'maler' | 'dachdecker') =>
   pages
-    .filter((p) => p.kind === `ort-${service}` && !/-2\/$/.test(p.path))
-    .map((p) => ({ name: cityName(p.path.slice(service.length + 2, -1)), href: p.path }))
+    .filter((p) => p.kind === `ort-${service}`)
+    .map((p) => ({ name: cityOverrides[p.path] ?? cityName(p.path.slice(service.length + 2, -1)), href: p.path }))
     .sort((a, b) => a.name.localeCompare(b.name, 'de'));
 
 export const serviceOfKind: Record<string, { label: string; href: string; service: 'geruestbau' | 'maler' | 'dachdecker' }> = {
