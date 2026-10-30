@@ -160,7 +160,7 @@ const faq = [
   <header class="site-header" id="top">
     <div class="wrap header-inner">
       <a href="#top" class="brand" aria-label="Stern Gerüstbau – zur Startseite">
-        <Image src={logo} alt="Stern Gerüstbau & Verleih" width={220} loading="eager" />
+        <Image src={logo} alt="Stern Gerüstbau & Verleih" width={640} widths={[320, 640]} sizes="(min-width: 1200px) 320px, (min-width: 640px) 280px, 240px" loading="eager" />
       </a>
       <nav class="main-nav" aria-label="Hauptnavigation">
         <a href="#leistungen">Leistungen</a>
@@ -599,10 +599,13 @@ const faq = [
     display: flex;
     align-items: center;
     gap: 24px;
-    min-height: 76px;
+    min-height: 84px;
+  }
+  .brand {
+    flex: none;
   }
   .brand img {
-    width: 180px;
+    width: 240px;
   }
   .main-nav {
     display: none;
@@ -631,7 +634,7 @@ const faq = [
   }
   @media (min-width: 640px) {
     .brand img {
-      width: 220px;
+      width: 280px;
     }
     .call-label {
       display: inline;
@@ -640,7 +643,15 @@ const faq = [
       padding: 0 20px;
     }
   }
-  @media (min-width: 1000px) {
+  @media (min-width: 1200px) {
+    .header-inner {
+      min-height: 100px;
+    }
+    .brand img {
+      width: 320px;
+    }
+  }
+  @media (min-width: 1200px) {
     .main-nav {
       display: flex;
     }
